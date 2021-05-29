@@ -30,7 +30,7 @@ def clean(text: str, delete_words: set = stopwords, lemmatize: bool=True) -> str
     if lemmatize:
         m = Mystem()
         lemmas = m.lemmatize(text)
-        text = ''.join(lemmas)
+        text = ''.join(lemmas)[:-1]
     print(text)
     return text
 

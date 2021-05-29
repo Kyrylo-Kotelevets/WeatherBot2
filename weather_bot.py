@@ -45,7 +45,7 @@ def get_audio_messages(message):
 
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
-    bot.reply_to(message, f'Я - криво реализованный погодный бот. Приятно познакомиться, {message.from_user.first_name}')
+    bot.reply_to(message, f'Привет, я - погодный бот. Приятно познакомиться, {message.from_user.first_name}')
 
 
 @bot.message_handler(content_types=['text'])

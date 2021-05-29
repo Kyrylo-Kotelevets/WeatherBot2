@@ -29,17 +29,23 @@ def answer(message: str) -> list:
     :param message: user text message
     :return: best answer
     """
+    unimportant_words = recognizing.stopwords.difference(file_to_list('resources/forecasts/VOCABULARY.txt'))
     cleaned_message = recognizing.clean(message)
 
     # At first check for weather forecast request
     acc = [recognizing.similarity(cleaned_message, forecasts[key]["patterns"]) for key in forecasts]
+    print(acc)
+
     for key in forecasts:
         if recognizing.similarity(cleaned_message, forecasts[key]["patterns"]) == max(acc) and max(acc) >= 0.58:
             return [forecasts[key]["title"], forecasts[key]["request"]()]
 
-    cleaned_message = recognizing.clean(message, None)
+    unimportant_words = recognizing.stopwords.difference(file_to_list('resources/replicas/VOCABULARY.txt'))
+    cleaned_message = recognizing.clean(message, unimportant_words)
     # At second check in usual phrases
     acc = [recognizing.similarity(cleaned_message, patt) for patt, _ in replicas]
+    print(acc)
+
     for patt, resp in replicas:
         if recognizing.similarity(cleaned_message, patt) == max(acc) and max(acc) >= 0.58:
             return [choice(resp)]
@@ -123,50 +129,41 @@ weather_emoji = {
     804: "☁"
 }
 
-# for filename in ['after_tomorrow', 'weekly']:
-#     with open(f'resources/forecasts/{filename}2.txt', 'wt', encoding='utf-8') as file:
-#         data = [recognizing.clean(word, None) for word in file_to_list("resources/forecasts/" + filename + ".txt")]
-#         file.write('\n'.join(data))
-
-# with open('resources/replicas/gratitude.txt', 'rt', encoding='utf-8') as file:
-#     for word in file.read().split('\n'):
-#         print(recognizing.clean(word, None))
-
 
 forecasts = {
     "current": {
-        "patterns": file_to_list("resources/forecasts/current2.txt"),
+        "patterns": file_to_list("resources/forecasts/current.txt"),
         "title": "Текущее состояние погоды",
         "request": lambda: current_to_msg(weather_parser.get_weather(weather_parser.CURRENT))
     },
     "today": {
-        "patterns": file_to_list("resources/forecasts/today2.txt"),
+        "patterns": file_to_list("resources/forecasts/today.txt"),
         "title": "Погода сегодня",
         "request": lambda: hourly_to_msg(weather_parser.get_weather(weather_parser.HOURLY))[0]
     },
     "tomorrow": {
-        "patterns": file_to_list("resources/forecasts/tomorrow2.txt"),
+        "patterns": file_to_list("resources/forecasts/tomorrow.txt"),
         "title": "Погода завтра",
         "request": lambda: hourly_to_msg(weather_parser.get_weather(weather_parser.HOURLY))[1]
     },
     "after_tomorrow": {
-        "patterns": file_to_list("resources/forecasts/after_tomorrow2.txt"),
+        "patterns": file_to_list("resources/forecasts/after_tomorrow.txt"),
         "title": "Погода послезавтра",
         "request": lambda: hourly_to_msg(weather_parser.get_weather(weather_parser.HOURLY))[2]
     },
     "weekly": {
-        "patterns": file_to_list("resources/forecasts/weekly2.txt"),
+        "patterns": file_to_list("resources/forecasts/weekly.txt"),
         "title": "8-дневный прогноз погоды",
         "request": lambda: weekly_to_msg(weather_parser.get_weather(weather_parser.WEEKLY))
     }
 }
 
 replicas = []
-for file in os.listdir("resources/replicas"):
-    if file.startswith('answer_'):
-        data = file_to_list("resources/replicas/" + file[7:])
-        ans = file_to_list("resources/replicas/" + file)
+for filename in os.listdir("resources/replicas"):
+    if filename != 'VOCABULARY.txt':
+        data = file_to_list("resources/replicas/" + filename)
+        ans = file_to_list("resources/answers/" + filename)
         replicas.append((data, ans))
 
 unrecognized = file_to_list('resources/Unrecognized.txt')
-print(replicas)
+# print(replicas)
