@@ -35,7 +35,7 @@ def get_audio_messages(message):
         try:
             # We use google services to recognize audio
             text = recognizer.recognize_google(audio, language="ru")
-            bot.send_message(message.from_user.id, text)
+            # bot.send_message(message.from_user.id, text)
 
             message.text = text
             get_text_messages(message)

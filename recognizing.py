@@ -27,10 +27,12 @@ def clean(text: str, delete_words: set = stopwords, lemmatize: bool=True) -> str
     if delete_words:
         text = ' '.join([word for word in text.split() if word not in delete_words])
 
+    # If need to lemmatize
     if lemmatize:
         m = Mystem()
         lemmas = m.lemmatize(text)
         text = ''.join(lemmas)[:-1]
+
     print(text)
     return text
 
@@ -48,12 +50,8 @@ def similarity(message: str, patterns: list) -> float:
     cos_sim = []
 
     for word in patterns:
-        unimportant_words = stopwords.difference(' '.join(word).split(' '))
-        # Preprocess and concatenate data
-        # data = [clean(message, unimportant_words), word]
-        data = [message, word]
         # Converts each word to vector
-        to_vector = CountVectorizer(lowercase=False).fit_transform(data)
+        to_vector = CountVectorizer(lowercase=False).fit_transform([message, word])
 
         vectors = to_vector.toarray()
         # Calculates cosine distance

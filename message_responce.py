@@ -30,18 +30,23 @@ def answer(message: str) -> list:
     :return: best answer
     """
     unimportant_words = recognizing.stopwords.difference(file_to_list('resources/forecasts/VOCABULARY.txt'))
-    cleaned_message = recognizing.clean(message)
+    cleaned_message = recognizing.clean(message, unimportant_words)
+    # print(len(cleaned_message))
+    # print(0.62 - min(max((len(cleaned_message) - 15) / 4, 0), 0.1))
 
     # At first check for weather forecast request
     acc = [recognizing.similarity(cleaned_message, forecasts[key]["patterns"]) for key in forecasts]
     print(acc)
 
     for key in forecasts:
-        if recognizing.similarity(cleaned_message, forecasts[key]["patterns"]) == max(acc) and max(acc) >= 0.58:
+        if recognizing.similarity(cleaned_message, forecasts[key]["patterns"]) == max(acc) \
+                and max(acc) >= 0.62 - min(max((len(cleaned_message) - 15) / 4, 0), 0.1):
             return [forecasts[key]["title"], forecasts[key]["request"]()]
 
     unimportant_words = recognizing.stopwords.difference(file_to_list('resources/replicas/VOCABULARY.txt'))
     cleaned_message = recognizing.clean(message, unimportant_words)
+    print(len(cleaned_message))
+
     # At second check in usual phrases
     acc = [recognizing.similarity(cleaned_message, patt) for patt, _ in replicas]
     print(acc)
